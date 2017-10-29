@@ -97,7 +97,7 @@
             if (!$('#deemo-container').length) return;
 
             var white = 30;// + 4 * Math.sin(now);
-            var black = 80 + 5 * Math.sin(clock/180*Math.PI);
+            var black = 80 + 5 * Math.sin(4*clock/180*Math.PI);
             $('#deemo-container').css('background', 
                 'radial-gradient(circle at 50% 150%, white '+white+'%, black '+black+'%)');
 
