@@ -1,0 +1,303 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Deemo!</title>
+    <link type="text/css" rel="stylesheet" href="css/materialize.min.css" media="screen,projection" />
+    <!-- <link type="text/css" rel="stylesheet" href="css/hover-min.css" media="screen,projection" /> -->
+    <link type="text/css" rel="stylesheet" href="css/style.css" media="screen,projection" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+
+    </style>
+</head>
+
+<body>
+
+    <main class="container">
+        <div>
+            <div class="row" style="margin-bottom: 0;">
+                <div id="deemo-container" class="col s12" style="line-height: 0;padding: 0;position: relative; width: 800px; height: 600px;">
+                    <div id="song-str"></div>
+                    <div id="level-str"></div>
+                    <div id="top-line"></div>
+                    <div id="notes-container">
+                        <div id="middle-str"></div>
+                        <!-- <canvas id="canv" width="800px" height="600px"></canvas> -->
+                    </div>
+                    <div id="lines">
+                        <div class="line"></div>
+                        <div class="line"></div>
+                        <div class="line"></div>
+                        <div class="line"></div>
+                        <div class="line" style="margin-bottom: 38px;"></div>
+                        <div class="line"></div>
+                        <div class="line"></div>
+                        <div class="line"></div>
+                        <div class="line"></div>
+                        <div class="line"></div>
+                        <div class="v-line"></div>
+                        <div class="v-line"></div>
+                    </div>
+                    <div id="bottom-line"></div>
+
+                </div>    
+            </div>
+            <div class="row" style="margin-bottom: 0;">
+                <form action="#" class="col s12">
+                    <div class="file-field input-field">
+                        <div class="btn">
+                            <input id="file_path" type="file">
+                            <span><i class="material-icons">music_note</i></span>
+                        </div>
+
+                        <div class="file-path-wrapper">
+                            <input class="file-path validate" type="text" placeholder="UPLOAD JSON FILE">
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+            <div class="row" style="margin-bottom: 0;">
+                <div class="col" style="width: 125.5px;">
+                    <a id="btn-replay" class="waves-effect waves-teal btn-flat btn-thin">
+                        <i class="material-icons">replay</i>
+                    </a>
+                    <a id="btn-play" class="waves-effect waves-teal btn-flat btn-thin">
+                        <i class="material-icons">play_arrow</i>
+                    </a>
+                    <a id="btn-pause" class="waves-effect waves-teal btn-flat btn-thin">
+                        <i class="material-icons">pause</i>
+                    </a>
+                </div>
+                <form action="#" class="col" style="width: 674.5px;">
+                    <div class="range-field">
+                        <input type="range" id="time_range" min="-100" max="100" />
+                    </div>
+                </form>
+                
+            </div>
+        </div>
+    </main>
+
+    <script type="text/javascript" src="js/jquery-2.1.3.min.js"></script>
+    <script type="text/javascript" src="js/materialize.min.js"></script>
+
+    <script>
+    var now, maxt, clock, data, name, fps, timer;
+
+    $(document).ready(function() {
+        now = 0;
+        maxt = 0;
+        clock = 0;
+        name = "";
+        fps = 50;
+        timer = setInterval(function() {
+            if (!$('#time_range').length) return;
+            if (!$('#deemo-container').length) return;
+
+            var white = 30;// + 4 * Math.sin(now);
+            var black = 80 + 5 * Math.sin(clock/180*Math.PI);
+            $('#deemo-container').css('background', 
+                'radial-gradient(circle at 50% 150%, white '+white+'%, black '+black+'%)');
+
+            var speed = $('#time_range').val() / fps / 10;
+            now += speed;
+            if (now < 0) now = 0;
+            if (now > maxt) now = maxt;
+            draw();
+            clock++;
+            if (clock > 18000000) clock = 0;
+        }, 1000 / fps);
+
+        $('#file_path')[0].onchange = uploadFile;
+        $('#btn-play').click(function() {
+            $('#time_range').val(10);
+        });
+
+        $('#btn-pause').click(function() {
+            $('#time_range').val(0);
+        });
+
+        $('#btn-replay').click(function() {
+            $('#time_range').val(10);
+            now = 0;
+        });
+    });
+    
+    // var ctx;
+
+    function uploadFile(e) {
+        //Materialize.toast('PROCESSING...', 200);
+        var file = e.target.files[0];
+        if (!file) return;
+        var filename = file.name;
+
+        name = filename;
+        var reader = new FileReader();
+        reader.onload = parseFile;
+        reader.readAsText(file);
+    }
+
+    function parseFile(e) {
+        data = JSON.parse(e.target.result);
+        init();
+        draw();
+    }
+
+    function init() {
+        // ctx = $('#canv')[0].getContext('2d');
+        now = 0;
+        $('#time_range').val(10);
+        console.log(data);
+        data.bins = []; // 按秒存放音符
+        var count = 1;
+        for (var i = 0; i < data.notes.length; i++) {
+            data.notes[i].type = 0;
+            if (data.notes[i].sounds == undefined) {
+                data.notes[i].type = 3;
+            }
+        }
+        for (var i = 0; i < data.links.length; i++) {
+            var link = data.links[i].notes;
+            for (var j = 0; j < link.length; j++) {
+                var id = link[j].$ref - 1;
+                data.notes[id].type = 2;
+                if (j != link.length - 1) {
+                    data.notes[id].next = data.notes[link[j + 1].$ref-1];
+                }
+            }
+        }
+        for (var i = 0; i < data.notes.length; i++) {
+            // console.log(data.notes[i].type);
+            if (data.notes[i].pos > 2 || 
+                data.notes[i].pos == undefined || 
+                data.notes[i]._time == undefined) continue;
+            data.notes[i].id = count;
+            count++;
+            var t = Math.floor(data.notes[i]._time);
+            if (data.bins[t] == undefined) data.bins[t] = [];
+            data.bins[t].push(data.notes[i]);
+            maxt = maxt < t ? t : maxt;
+        }
+
+        // $('#notes-container')[0].innerHTML = '<div id="middle-str"></div>';
+        $('.note').remove();
+        // $('#time_range').val(0).attr('max', maxt*10 + 1);
+        // $('#time_range')[0].onmousemove = timeChanged;
+        $('#song-str,#middle-str').text(name.split('#')[0]);
+        $('#level-str').text(name.split('#')[2].split('.')[0]);
+    }
+
+    function timeChanged() {
+        // var tmp = parseFloat($('#time_range').val()) / 10;
+        // if (tmp == now) return;
+        // now = tmp;
+        // draw();
+    }
+
+    function draw() {
+        if (!data) return;
+        // console.log(now);
+        // $('#notes-container')[0].innerHTML = '';
+
+
+        var st = now - 1;
+        var ed = now + 6;
+        for (var i = 0; i < data.bins.length; i++) {
+            if (data.bins[i] == undefined) continue;
+            if (i >= st && i <= ed) continue;
+            for (var j = 0; j < data.bins[i].length; j++) {
+                $('#note-'+data.bins[i][j].id).remove();
+            }
+        }
+        for (var i = st; i <= ed; i++) {
+            if (i < 0) continue;
+            var j = Math.floor(i);
+            if (data.bins[j] == undefined) continue;
+
+            for (var k = 0; k < data.bins[j].length; k++) {
+                drawNote(data.bins[j][k]);
+            }
+        }
+    }
+
+    function drawNote(note) {
+        // console.log(note);
+        // pos, size, _time
+        var id = note.id;
+        var posx = 50 + 140 * note.pos / 8;
+        var posy = 200 * (note._time - now);
+        var size = note.size * 175 / 8;
+        var type = note.type;
+        var u = 900, v = 200;
+        var opacity = (u - posy) / (u - v);
+
+
+        var thr = 12;
+
+        if (posy < thr) {
+            posy = thr - (thr - posy) / 4;
+            // opacity = Math.sqrt(Math.max(0, posy / thr));
+            opacity = posy / thr;
+        }
+
+        if (opacity > 1) opacity = 1;
+        if (opacity < 0) opacity = 0;
+
+
+        posx -= size / 2;
+        posx += '%';
+        size += '%';
+        if ($('#note-'+id).length == 0) {
+            var $note = type == 0?$('<note>'):(type==2?$('<note2>'):$('<note3>'));
+            $note.attr('id', 'note-'+id);
+            $('#notes-container').append($note);
+        }
+        $('#note-'+id)
+            .text(id)
+            .css('position', 'absolute')
+            .css('left', posx)
+            .css('bottom', posy)
+            .css('width', size)
+            .css('opacity', opacity)
+            .attr('class', 'note');
+        // if (note.next != undefined) {
+        //     drawLink(note);
+        // }
+    }
+
+    function drawLink(note) {
+        var id = note.id;
+        var posx = 50 + 140 * note.pos / 8;
+        var posx2 = 50 + 140 * note.next.pos / 8;
+        var posy = 150 * (note._time - now);
+        var posy2 = 150 * (note.next._time - now);
+        // var size = note.size * 175 / 8;
+        // posx += '%';
+        // posx2 += '%';
+
+        var u = 900, v = 200;
+        var opacity = (u - posy) / (u - v);
+        if (opacity > 1) opacity = 1;
+        if (opacity < 0) opacity = 0;
+        if ($('#link-'+id).length == 0) {
+            var $link = $('<line>');
+            $link.attr('id', 'link-'+id)
+                .attr('class', 'note');
+
+            $('#notes-container').append($link);
+        }
+        // $('#link-'+id).append()
+       $('#link-'+id)
+            .css('left', posx + '%')
+            .css('width', posx2 - posx + '%')
+            .css('bottom', posy + 9)
+            .css('height', posy2 -  posy)
+            .css('opacity', opacity);
+    }
+
+
+    </script>
+</body>
+</html>

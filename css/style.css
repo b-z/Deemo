@@ -1,0 +1,303 @@
+@font-face {
+    font-family: 'Material Icons';
+    font-style: normal;
+    font-weight: 400;
+    src: local('Material Icons'), local('MaterialIcons-Regular'), url(../fonts/material-design-icons/1.woff2) format('woff2');
+}
+
+@font-face {
+    font-family: 'Abel';
+    font-style: normal;
+    font-weight: 400;
+    src: local('Abel'), local('Abel-Regular'), url(../fonts/material-design-icons/2.woff2) format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
+}
+
+@font-face {
+    font-family: 'FANTIQUE';
+    font-style: normal;
+    font-weight: 400;
+    src: local('FANTIQUE'), local('FANTIQUE-Regular'), url(../fonts/FANTIQUE.TTF);
+}
+
+.material-icons {
+    font-family: 'Material Icons';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    word-wrap: normal;
+    -webkit-font-feature-settings: 'liga';
+    -webkit-font-smoothing: antialiased;
+}
+
+body {
+    font-family: 'FANTIQUE';
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+    background-color: #FAFAFA!important;
+}
+
+main {
+    display: flex;
+    flex: 1 0 auto;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1rem!important;
+    margin-bottom: 1rem!important;
+}
+
+
+
+canvas {
+    /*border: 20px solid black;*/
+    /*height: 100%;*/
+    width: 100%;
+    cursor: crosshair;
+}
+
+#canvas {
+    background-color: white;
+}
+
+
+red {
+    color: rgb(244, 67, 54);
+}
+
+pink {
+    color: rgb(233, 30, 99);
+}
+
+purple {
+    color: rgb(156, 39, 176);
+}
+
+indigo {
+    color: rgb(63, 81, 181);
+}
+
+aqua, blue {
+    color: rgb(33, 150, 243);
+}
+
+cyan {
+    color: rgb(0, 188, 212);
+}
+
+teal {
+    color: rgb(0, 150, 136);
+}
+
+green {
+    color: rgb(76, 175, 80);
+}
+
+lime {
+    color: rgb(205, 220, 57);
+}
+
+yellow {
+    color: rgb(255, 235, 59);
+}
+
+amber {
+    color: rgb(255, 193, 7);
+}
+
+orange {
+    color: rgb(255, 152, 0);
+}
+
+brown {
+    color: rgb(121, 85, 72);
+}
+
+grey {
+    color: rgb(158, 158, 158);
+}
+
+black {
+    background-color: black;
+}
+
+
+
+shadow {
+    text-shadow: 2.5px 1px rgba(0, 0, 0, 0.15);
+}
+
+.tap-target-wave a {
+    display: none;
+}
+
+.fixed-action-btn {
+    z-index: 10000;
+}
+
+nav {
+    box-shadow: initial;
+}
+
+#info {
+    font-size: 10px;
+    overflow: auto;
+    cursor: default;
+}
+
+#buttons {
+    min-width: 270px;
+}
+
+.vertex {
+    background-color: #009688;
+    height: 6px;
+    width: 6px;
+    position: absolute;
+    /*border-radius: 50%;*/
+    transform: translateX(-50%) translateY(-50%);
+    cursor: pointer;
+    transition: width 0.3s, height 0.3s, border-radius 0.3s;
+}
+
+.vertex:hover {
+    border: 2px solid #009688;
+    height: 12px;
+    width: 12px;
+    border-radius: 50%;
+}
+
+.vertex.active {
+    background-color: white;
+    border: 2px solid #009688;
+    height: 12px;
+    width: 12px;
+    border-radius: 50%;
+}
+
+note, note2, note3 {
+    /*transition: all 0.02s;*/
+    /*border: 1px solid green;*/
+    text-align: center;
+    height: 18px;
+    background-size: 100% 100%;
+    font-family: 'FANTIQUE';
+}
+
+note {
+    background-image: url(../img/note.png);
+}
+
+note2 {
+    background-image: url(../img/link.png);
+}
+
+note3 {
+    background-image: url(../img/nosound.png);
+}
+
+#deemo-container {
+    /*border: 2px solid black;*/
+    /*overflow: hidden;*/
+    perspective: 180px;
+    /*background-image: url(../img/5.jpg);*/
+    /*background-size: contain;*/
+    background: radial-gradient(circle at 50% 150%, white 30%, black 80%);
+    overflow: hidden;
+}
+
+#notes-container {
+    transform: rotateX(45deg) translateY(-140px);
+    width: 45%;
+    height: 100%;
+    /*border: 1px solid;*/
+    margin: auto;
+}
+
+#top-line {
+    border: 1px solid #888;
+    position: absolute;
+    width: 100%;
+    left: 0;
+    top: 49px;
+}
+
+#bottom-line {
+    position: absolute;
+    width: 100%;
+    left: 0;
+    bottom: 77px;
+    height: 16px;
+    background: linear-gradient(to top, rgba(0,0,0,0), rgb(0,0,0) 20%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,0.15) 60%,rgba(0,0,0,0));
+}
+
+#song-str {
+    color: white;
+    position: absolute;
+    left: 62px;
+    top: 35px;
+    font-size: 25px;
+}
+
+#level-str {
+    color: white;
+    position: absolute;
+    left: 64px;
+    top: 66px;
+    font-size: 24px;
+}
+
+#middle-str {
+    color: rgba(0,0,0,0.2);
+    position: absolute;
+    top: 502px;
+    width: 100%;
+    text-align: center;
+    font-size: 38px;
+    font-weight: bold;
+    transform: rotateX(45deg) scaleX(1.8);
+}
+
+#lines {
+    transform: rotateX(45deg) translateY(-310px);
+}
+
+#lines .line {
+    border: 1px solid rgba(0,0,0,0.2);
+    width: 300%;
+    margin-bottom: 8px;
+    position: relative;
+    left: -100%;
+}
+
+#lines .v-line {
+    border-width: 0 6px;
+    border-color: rgba(0,0,0,0.2);
+    border-style: solid;
+    width: 136%;
+    height: 120px;
+    position: absolute;
+    top: 0;
+    left: -18%;
+}
+
+line {
+    background-image: url(../img/line.png);
+    position: absolute;
+    background-size: 100% 100%;
+}
+
+.btn-thin {
+    width: 36px;
+    color: rgb(38, 166, 154);
+    padding: 0;
+    text-align: center;
+}
+
+.row .col {
+    padding: 0;
+}
